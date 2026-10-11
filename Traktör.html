@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🚜 Traktör — Usta Kutusu</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --orange: #ff6b1a;
+    --orange-dark: #e85a00;
+    --orange-light: #ffa55c;
+    --black: #0d1117;
+    --dark: #161b22;
+    --mid: #21262d;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: var(--black);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  .header {
+    background: linear-gradient(135deg, var(--orange) 0%, var(--orange-dark) 100%);
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(255, 107, 26, 0.4);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  }
+
+  .header .subtitle {
+    font-size: 13px;
+    color: rgba(255,255,255,0.85);
+    margin-top: 6px;
+    letter-spacing: 1px;
+    font-weight: 500;
+  }
+
+  .greeting {
+    max-width: 900px;
+    margin: 20px auto 0;
+    padding: 16px 24px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50px;
+    text-align: center;
+    font-size: 15px;
+    color: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  @media (min-width: 700px) {
+    .container {
+      grid-template-columns: 1fr 1fr;
+    }
+    .full-width {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .card {
+    background: var(--dark);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    transition: all 0.25s ease;
+  }
+
+  .card:hover {
+    border-color: var(--orange);
+    box-shadow: 0 0 20px rgba(255, 107, 26, 0.15);
+  }
+
+  .card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--orange);
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .card-title .icon {
+    font-size: 22px;
+  }
+
+  label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--mid);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 15px;
+    font-family: inherit;
+    transition: border 0.2s;
+  }
+
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(255, 107, 26, 0.15);
+  }
+
+  .btn {
+    width: 100%;
+    padding: 11px;
+    background: linear-gradient(135deg, var(--orange) 0%, var(--orange-dark) 100%);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(255, 107, 26, 0.35);
+  }
+
+  .btn:active {
+    transform: translateY(0);
+  }
+
+  .btn.small {
+    width: auto;
+    padding: 6px 14px;
+    font-size: 12px;
+    margin-top: 0;
+  }
+
+  .result {
+    margin-top: 12px;
+    padding: 12px;
+    background: var(--mid);
+    border-radius: 8px;
+    border-left: 4px solid var(--orange);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 20px;
+  }
+
+  .result.success { border-left-color: var(--green); }
+  .result.error   { border-left-color: var(--red); }
+  .result.warning { border-left-color: var(--yellow); }
+
+  .result .big {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--orange-light);
+    display: block;
+    margin: 4px 0;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .mini-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .mini-box {
+    background: var(--mid);
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+
+  .mini-box .label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .mini-box .value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--orange-light);
+    margin-top: 4px;
+  }
+
+  .list {
+    list-style: none;
+  }
+
+  .list li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .list li:last-child { border-bottom: none; }
+
+  .list .name { color: var(--text-dim); }
+
+  .list .code {
+    color: var(--orange-light);
+    font-weight: 700;
+    font-family: 'Consolas', monospace;
+  }
+
+  .note-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    align-items: center;
+  }
+
+  .note-actions .btn.small {
+    flex: 0 0 auto;
+  }
+
+  .clear-btn {
+    background: linear-gradient(135deg, #f85149 0%, #b91c1c 100%);
+  }
+
+  .clear-btn:hover {
+    box-shadow: 0 6px 20px rgba(248, 81, 73, 0.35);
+  }
+
+  .storage-info {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: center;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
+  }
+
+  .footer {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 12px;
+    margin-top: 30px;
+    padding: 20px;
+  }
+</style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>🚜 Traktör</h1>
+    <div class="subtitle">Usta Kutusu — Tamirci Araçları</div>
+    <div class="greeting" id="greeting">Merhaba Usta! 👋</div>
+  </div>
+
+  <div class="container">
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📱</span> IMEI Kontrol</div>
+      <label>15 Haneli IMEI Numarası</label>
+      <input type="text" id="imei" maxlength="15" placeholder="Örn: 356938035643809">
+      <button class="btn" onclick="checkImei()">Kontrol Et</button>
+      <div class="result" id="imeiResult">Numarayı girip kontrol edin.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">⚡</span> Ohm Hesaplayıcı</div>
+      <div class="row">
+        <div>
+          <label>Voltaj (V)</label>
+          <input type="number" id="volt" placeholder="0">
+        </div>
+        <div>
+          <label>Akım (A)</label>
+          <input type="number" id="amper" placeholder="0">
+        </div>
+      </div>
+      <div class="row" style="margin-top:10px;">
+        <div>
+          <label>Direnç (Ω)</label>
+          <input type="number" id="ohm" placeholder="0">
+        </div>
+        <div>
+          <label>Güç (W)</label>
+          <input type="number" id="watt" placeholder="0">
+        </div>
+      </div>
+      <button class="btn" onclick="calcOhm()">Hesapla (Boş Bırakılanı Bul)</button>
+      <div class="result" id="ohmResult">V, I, R veya P'den ikisini girin.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">💾</span> Birim Dönüştürücü</div>
+      <label>Değer</label>
+      <input type="number" id="convertValue" placeholder="Örn: 1024">
+      <div class="row" style="margin-top:10px;">
+        <div>
+          <label>Kaynak</label>
+          <select id="sourceUnit">
+            <option value="MB">MB</option>
+            <option value="GB">GB</option>
+            <option value="TB">TB</option>
+          </select>
+        </div>
+        <div>
+          <label>Hedef</label>
+          <select id="targetUnit">
+            <option value="GB">GB</option>
+            <option value="MB">MB</option>
+            <option value="TB">TB</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" onclick="convertUnit()">Çevir</button>
+      <div class="result" id="convertResult">Değer girip çevirin.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🔧</span> Vida / Tornavida Rehberi</div>
+      <label>Cihaz Türü</label>
+      <select id="deviceSelect" onchange="showScrews()">
+        <option value="">— Seçiniz —</option>
+        <option value="iPhone">iPhone</option>
+        <option value="Samsung">Samsung Galaxy</option>
+        <option value="Xiaomi">Xiaomi / Redmi</option>
+        <option value="Huawei">Huawei</option>
+        <option value="Laptop">Dizüstü Bilgisayar</option>
+        <option value="PS4">PlayStation 4</option>
+      </select>
+      <ul class="list" id="screwList" style="margin-top:14px;">
+        <li><span class="name">Cihaz seçin</span></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📺</span> Ekran Çözünürlük Karşılaştırma</div>
+      <div class="row">
+        <div>
+          <label>Genişlik</label>
+          <input type="number" id="screenW" value="1920">
+        </div>
+        <div>
+          <label>Yükseklik</label>
+          <input type="number" id="screenH" value="1080">
+        </div>
+      </div>
+      <button class="btn" onclick="calcScreen()">Hesapla</button>
+      <div class="result" id="screenResult">Değerleri girin.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">💰</span> Fiyat Hesaplayıcı</div>
+      <div class="row">
+        <div>
+          <label>Parça (₺)</label>
+          <input type="number" id="partPrice" placeholder="0">
+        </div>
+        <div>
+          <label>İşçilik (₺)</label>
+          <input type="number" id="laborPrice" placeholder="0">
+        </div>
+      </div>
+      <label style="margin-top:10px;">KDV Oranı (%)</label>
+      <select id="vatRate">
+        <option value="0">KDV Yok</option>
+        <option value="10">%10</option>
+        <option value="20" selected>%20</option>
+      </select>
+      <button class="btn" onclick="calcPrice()">Topla</button>
+      <div class="result" id="priceResult">Parça ve işçilik girin.</div>
+    </div>
+
+    <div class="card full-width">
+      <div class="card-title"><span class="icon">📋</span> Hızlı Not</div>
+      <label>Not</label>
+      <input type="text" id="noteInput" placeholder="Örn: Ahmet Bey - Ekran değişimi - 15:30">
+      <div class="note-actions">
+        <button class="btn" style="flex:1; margin-top:0;" onclick="addNote()">Not Ekle</button>
+        <button class="btn small clear-btn" onclick="clearAllNotes()">Tümünü Sil</button>
+      </div>
+      <ul class="list" id="noteList" style="margin-top:14px;">
+        <li><span class="name">Henüz not yok.</span></li>
+      </ul>
+      <div class="storage-info" id="storageInfo">
+        💾 Notlar tarayıcıda kalıcı olarak saklanır
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    🚜 Traktör — Usta Kutusu<br>
+    Arkadaşınız için sevgiyle yapıldı ❤️
+  </div>
+
+<script>
+  const STORAGE_KEY = 'traktor_notes';
+
+  function checkImei() {
+    const imei = document.getElementById('imei').value.replace(/\s/g, '');
+    const result = document.getElementById('imeiResult');
+
+    if (imei.length !== 15 || !/^\d+$/.test(imei)) {
+      result.className = 'result error';
+      result.innerHTML = '❌ <strong>Geçersiz!</strong> IMEI 15 haneli ve sadece rakam olmalı.';
+      return;
+    }
+
+    let total = 0;
+    for (let i = 0; i < 15; i++) {
+      let digit = parseInt(imei[i]);
+      if (i % 2 === 1) {
+        digit *= 2;
+        if (digit > 9) digit -= 9;
+      }
+      total += digit;
+    }
+
+    const valid = total % 10 === 0;
+
+    if (valid) {
+      result.className = 'result success';
+      result.innerHTML = `✅ <strong>Geçerli IMEI!</strong><span class="big">${imei}</span>Luhn algoritması doğrulandı.`;
+    } else {
+      result.className = 'result error';
+      result.innerHTML = `❌ <strong>Geçersiz IMEI!</strong><span class="big">${imei}</span>Luhn kontrolü başarısız.`;
+    }
+  }
+
+  function calcOhm() {
+    const v = parseFloat(document.getElementById('volt').value) || null;
+    const i = parseFloat(document.getElementById('amper').value) || null;
+    const r = parseFloat(document.getElementById('ohm').value) || null;
+    const p = parseFloat(document.getElementById('watt').value) || null;
+    const result = document.getElementById('ohmResult');
+
+    const filled = [v, i, r, p].filter(x => x !== null).length;
+    if (filled < 2) {
+      result.className = 'result warning';
+      result.innerHTML = '⚠️ En az <strong>iki</strong> değer girin.';
+      return;
+    }
+
+    let vv = v, ii = i, rr = r, pp = p;
+
+    if (vv !== null && ii !== null) { rr = vv / ii; pp = vv * ii; }
+    else if (vv !== null && rr !== null) { ii = vv / rr; pp = vv * ii; }
+    else if (vv !== null && pp !== null) { ii = pp / vv; rr = vv / ii; }
+    else if (ii !== null && rr !== null) { vv = ii * rr; pp = vv * ii; }
+    else if (ii !== null && pp !== null) { vv = pp / ii; rr = vv / ii; }
+    else if (rr !== null && pp !== null) { ii = Math.sqrt(pp / rr); vv = ii * rr; }
+
+    result.className = 'result success';
+    result.innerHTML = `
+      ⚡ <strong>Sonuçlar:</strong><br>
+      <div class="mini-grid">
+        <div class="mini-box"><div class="label">Voltaj</div><div class="value">${vv.toFixed(2)} V</div></div>
+        <div class="mini-box"><div class="label">Akım</div><div class="value">${ii.toFixed(3)} A</div></div>
+        <div class="mini-box"><div class="label">Direnç</div><div class="value">${rr.toFixed(2)} Ω</div></div>
+        <div class="mini-box"><div class="label">Güç</div><div class="value">${pp.toFixed(2)} W</div></div>
+      </div>
+    `;
+  }
+
+  function convertUnit() {
+    const value = parseFloat(document.getElementById('convertValue').value);
+    const source = document.getElementById('sourceUnit').value;
+    const target = document.getElementById('targetUnit').value;
+    const result = document.getElementById('convertResult');
+
+    if (isNaN(value)) {
+      result.className = 'result warning';
+      result.innerHTML = '⚠️ Bir değer girin.';
+      return;
+    }
+
+    const multipliers = { MB: 1, GB: 1024, TB: 1024 * 1024 };
+    const mbValue = value * multipliers[source];
+    const targetValue = mbValue / multipliers[target];
+
+    result.className = 'result success';
+    result.innerHTML = `📊 <strong>${value} ${source}</strong> = <span class="big">${targetValue.toFixed(4)} ${target}</span>`;
+  }
+
+  const screwData = {
+    iPhone: [
+      ['Alt vidalar', 'Pentalobe P2'],
+      ['İç vidalar', 'Phillips PH000'],
+      ['Kamera kapağı', 'Phillips PH000'],
+      ['Anakart', 'Standoff (Y tipi)']
+    ],
+    Samsung: [
+      ['Arka kapak', 'Isıtma + Açıcı'],
+      ['İç vidalar', 'Phillips PH000'],
+      ['Anakart', 'Phillips PH00']
+    ],
+    Xiaomi: [
+      ['Alt vidalar', 'Torx T5'],
+      ['İç vidalar', 'Phillips PH000'],
+      ['Batarya', 'Phillips PH0']
+    ],
+    Huawei: [
+      ['Alt vidalar', 'Torx T4'],
+      ['İç vidalar', 'Phillips PH00']
+    ],
+    Laptop: [
+      ['Alt kapak', 'Phillips PH0 veya PH1'],
+      ['Fan', 'Phillips PH00'],
+      ['Anakart', 'Phillips PH00'],
+      ['Ekran menteşesi', 'Torx T5']
+    ],
+    PS4: [
+      ['Arka vidalar', 'Torx T9 Security'],
+      ['İç vidalar', 'Phillips PH0'],
+      ['Blu-ray sürücü', 'Phillips PH0']
+    ]
+  };
+
+  function showScrews() {
+    const selected = document.getElementById('deviceSelect').value;
+    const list = document.getElementById('screwList');
+
+    if (!selected || !screwData[selected]) {
+      list.innerHTML = '<li><span class="name">Cihaz seçin</span></li>';
+      return;
+    }
+
+    list.innerHTML = screwData[selected].map(([place, screw]) =>
+      `<li><span class="name">${place}</span><span class="code">${screw}</span></li>`
+    ).join('');
+  }
+
+  function calcScreen() {
+    const w = parseInt(document.getElementById('screenW').value);
+    const h = parseInt(document.getElementById('screenH').value);
+    const result = document.getElementById('screenResult');
+
+    if (!w || !h) {
+      result.className = 'result warning';
+      result.innerHTML = '⚠️ Genişlik ve yükseklik girin.';
+      return;
+    }
+
+    const mp = (w * h) / 1000000;
+    const gcd = (a, b) => b ? gcd(b, a % b) : a;
+    const g = gcd(w, h);
+
+    let quality;
+    if (w >= 3840) quality = '4K / Ultra HD';
+    else if (w >= 2560) quality = '2K / QHD';
+    else if (w >= 1920) quality = 'Full HD';
+    else if (w >= 1280) quality = 'HD';
+    else quality = 'SD veya düşük';
+
+    result.className = 'result success';
+    result.innerHTML = `
+      📺 <strong>Ekran Analizi:</strong><br>
+      <div class="mini-grid">
+        <div class="mini-box"><div class="label">Çözünürlük</div><div class="value">${w}×${h}</div></div>
+        <div class="mini-box"><div class="label">Megapiksel</div><div class="value">${mp.toFixed(2)} MP</div></div>
+        <div class="mini-box"><div class="label">Oran</div><div class="value">${w/g}:${h/g}</div></div>
+        <div class="mini-box"><div class="label">Sınıf</div><div class="value">${quality}</div></div>
+      </div>
+      <p style="margin-top:10px; font-size:13px; color:#8b949e;">
+      16:9 oranı → 1920×1080 / 1280×720 (standart)<br>
+      16:10 oranı → 1920×1200 (MacBook)<br>
+      4:3 oranı → 1024×768 (eski ekranlar)</p>
+    `;
+  }
+
+  function calcPrice() {
+    const part = parseFloat(document.getElementById('partPrice').value) || 0;
+    const labor = parseFloat(document.getElementById('laborPrice').value) || 0;
+    const vatRate = parseFloat(document.getElementById('vatRate').value);
+    const result = document.getElementById('priceResult');
+
+    const subtotal = part + labor;
+    const vat = subtotal * (vatRate / 100);
+    const total = subtotal + vat;
+
+    result.className = 'result success';
+    result.innerHTML = `
+      💰 <strong>Fiyat Dökümü:</strong><br>
+      <div class="mini-grid">
+        <div class="mini-box"><div class="label">Parça</div><div class="value">${part.toFixed(2)} ₺</div></div>
+        <div class="mini-box"><div class="label">İşçilik</div><div class="value">${labor.toFixed(2)} ₺</div></div>
+        <div class="mini-box"><div class="label">KDV (%${vatRate})</div><div class="value">${vat.toFixed(2)} ₺</div></div>
+        <div class="mini-box" style="background:rgba(255,107,26,0.15); border-color:var(--orange);">
+          <div class="label">Toplam</div>
+          <div class="value" style="font-size:22px;">${total.toFixed(2)} ₺</div>
+        </div>
+      </div>
+    `;
+  }
+
+  let notes = [];
+
+  function loadNotes() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        notes = JSON.parse(stored);
+        if (!Array.isArray(notes)) notes = [];
+      } else {
+        notes = [];
+      }
+    } catch (e) {
+      console.warn('Notlar yüklenemedi:', e);
+      notes = [];
+    }
+    renderNotes();
+    updateStorageInfo();
+  }
+
+  function saveNotes() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+      return true;
+    } catch (e) {
+      console.warn('Notlar kaydedilemedi:', e);
+      return false;
+    }
+  }
+
+  function updateStorageInfo() {
+    const info = document.getElementById('storageInfo');
+    if (notes.length === 0) {
+      info.textContent = '💾 Notlar tarayıcıda kalıcı olarak saklanır';
+    } else {
+      info.textContent = `💾 ${notes.length} not kayıtlı — tarayıcıda kalıcı olarak saklanır`;
+    }
+  }
+
+  function addNote() {
+    const input = document.getElementById('noteInput');
+    const text = input.value.trim();
+
+    if (!text) {
+      alert('Not boş olamaz!');
+      return;
+    }
+
+    const time = new Date().toLocaleString('tr-TR', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+
+    notes.unshift({ text, time });
+
+    if (saveNotes()) {
+      input.value = '';
+      renderNotes();
+      updateStorageInfo();
+    } else {
+      alert('Not kaydedilemedi! Tarayıcı depolaması dolu olabilir.');
+    }
+  }
+
+  function renderNotes() {
+    const list = document.getElementById('noteList');
+
+    if (notes.length === 0) {
+      list.innerHTML = '<li><span class="name">Henüz not yok.</span></li>';
+      return;
+    }
+
+    list.innerHTML = notes.map((n, i) =>
+      `<li>
+        <span class="name" style="color:var(--text); flex:1; word-break:break-word;">${escapeHtml(n.text)}</span>
+        <span class="code" style="font-size:12px; white-space:nowrap;">${n.time}</span>
+        <button onclick="deleteNote(${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:16px;padding:4px 8px;">✕</button>
+      </li>`
+    ).join('');
+  }
+
+  function deleteNote(i) {
+    notes.splice(i, 1);
+    saveNotes();
+    renderNotes();
+    updateStorageInfo();
+  }
+
+  function clearAllNotes() {
+    if (notes.length === 0) {
+      alert('Silinecek not yok.');
+      return;
+    }
+    if (confirm(`Tüm notlar silinsin mi? (${notes.length} not)`)) {
+      notes = [];
+      saveNotes();
+      renderNotes();
+      updateStorageInfo();
+    }
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  const hour = new Date().getHours();
+  let greeting = 'Merhaba';
+  if (hour < 6) greeting = 'İyi geceler';
+  else if (hour < 12) greeting = 'Günaydın';
+  else if (hour < 18) greeting = 'İyi günler';
+  else greeting = 'İyi akşamlar';
+
+  document.getElementById('greeting').innerHTML = `${greeting} Usta! 🚜 — Traktör hazır, iyi çalışmalar!`;
+
+  loadNotes();
+</script>
+</body>
+</html>
